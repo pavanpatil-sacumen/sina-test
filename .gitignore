@@ -1,0 +1,41 @@
+# Ignore the .env file with secrets
+.env
+
+# Ignore log and temp files
+log/
+tmp/
+
+# Ignore system files
+*.swp
+.DS_Store
+Thumbs.db
+
+# Ignore Ruby-specific files
+*.gem
+*.rbc
+
+# Ignore Bundler config
+/.bundle
+/vendor/bundle
+
+# Ignore compiled output
+*.so
+*.o
+*.a
+
+# Ignore test coverage reports
+coverage/
+
+# Ignore byebug history
+.byebug_history
+
+# Ignore node_modules if using frontend tooling
+node_modules/
+
+# Ignore project-specific SQLite or database files (optional)
+*.sqlite3
+*.db
+
+# Ignore editor-specific folders
+.idea/
+.vscode/
