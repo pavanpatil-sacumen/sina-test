@@ -12,6 +12,11 @@ require 'teamserver'
 require 'rack'
 require 'rack/contrib'
 
+require 'sinatra'
+require 'net/http'
+require 'uri'
+require 'base64'
+
 class SBApp < Sinatra::Base
 	use Rack::JSONBodyParser # middleware so we can get post body data via 'params' variable
 
@@ -81,5 +86,40 @@ class SBApp < Sinatra::Base
     logger.info 'Unbind Request Received'
     status 200
     {}.to_json
+  end
+
+  get '/notifications/count' do
+  	content_type :json
+
+	  # Your actual credentials
+	  username = ENV['CONTRAST_USERNAME']
+	  service_key = ENV['CONTRAST_SERVICE_KEY']
+
+	  # Encode credentials as Base64 (like btoa in Node)
+  	auth_string = Base64.strict_encode64("#{username}:#{service_key}")
+
+  	# API URL
+	  api_url = "https://apptwo.contrastsecurity.com/Contrast/api/ng/969321ad-da28-4c8a-9bac-18ca5553b301/notifications/count/new?expand=skip_links"
+	  uri = URI(api_url)
+
+	  # Set up the request
+	  req = Net::HTTP::Get.new(uri)
+	  req['Authorization'] = "Basic #{auth_string}"
+	  req['API-Key'] = "YBw9HdoM31pDFz6ziFRmy7vGT47BoL30"
+	  req['Accept'] = 'application/json'
+
+	  # Make the HTTP call
+	  res = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
+	    http.request(req)
+	  end
+
+	  # Parse and return response
+	  if res.is_a?(Net::HTTPSuccess)
+	    body = JSON.parse(res.body)
+	    { success: true, count: body["count"] }.to_json
+	  else
+	    status res.code.to_i
+	    { success: false, error: "Failed to fetch notifications" }.to_json
+	  end
   end
 end
