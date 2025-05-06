@@ -21,4 +21,12 @@ class Catalog
     end
     @catalog['services'].first['plans'] = @plans
   end
+
+  def find_plan plan_id
+    @plans.find {|plan| plan.id == plan_id}
+  end
+
+  def catalog_response
+    @catalog
+  end
 end

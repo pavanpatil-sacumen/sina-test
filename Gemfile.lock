@@ -38,6 +38,9 @@ GEM
     pry (0.15.2)
       coderay (~> 1.1)
       method_source (~> 1.0)
+    pry-byebug (3.11.0)
+      byebug (~> 12.0)
+      pry (>= 0.13, < 0.16)
     public_suffix (6.0.2)
     puma (6.6.0)
       nio4r (~> 2.0)
@@ -95,13 +98,13 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  byebug
   dotenv
   httparty
   json
   minitest
   mocha
   pry
+  pry-byebug
   puma (~> 6.6)
   rack
   rack-contrib

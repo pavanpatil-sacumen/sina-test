@@ -20,11 +20,11 @@ group :test do
   gem 'rack-test'
   gem 'mocha', require: false
   gem 'webmock'
-  gem 'pry'
 end
 
 group :development do
-  gem 'byebug'
+  gem 'pry'
+  gem 'pry-byebug'
 end
 
 gem 'dotenv'
