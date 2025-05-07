@@ -1,7 +1,20 @@
+require 'simplecov'
+
+SimpleCov.start do
+  add_filter '/spec/'   # or '/test/', depending on your test folder
+end
+
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'app'))
+
 require 'json'
 require 'sb_app'
 require 'rack/test'
+require 'rspec'
+require 'webmock/rspec'
+
+ENV['RACK_ENV'] = 'test'
+
+WebMock.disable_net_connect!(allow_localhost: false)
 
 module RSpecMixin
   include Rack::Test::Methods
@@ -33,4 +46,6 @@ RSpec.configure do |config|
   ENV['CONTRAST_SERVICE_PLANS'] = service_plans_env.to_json
   ENV['SECURITY_USER_NAME'] = 'TEST_USER'
   ENV['SECURITY_USER_PASSWORD'] = 'TEST_PASSWORD'
+  ENV['CONTRAST_USERNAME'] = 'pavan.patil@sacumen.com'
+  ENV['CONTRAST_SERVICE_KEY'] = 'ADORTRKUUKL15YNU'
 end

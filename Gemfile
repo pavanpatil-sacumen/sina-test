@@ -20,6 +20,7 @@ group :test do
   gem 'rack-test'
   gem 'mocha', require: false
   gem 'webmock'
+  gem 'simplecov', require: false
 end
 
 group :development do

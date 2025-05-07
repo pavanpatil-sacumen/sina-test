@@ -30,6 +30,13 @@ class SBApp < Sinatra::Base
     username == ENV['SECURITY_USER_NAME'] && password == ENV['SECURITY_USER_PASSWORD']
   end
 
+  before do
+	  unless settings.environment == :test
+	    allowed_hosts = ['apptwo.contrastsecurity.com']
+	    halt 403, 'Host not permitted' unless allowed_hosts.include?(request.host)
+	  end
+	end
+
   get '/v2/catalog' do
 	  content_type :json
 	  logger.info 'Catalog Request Received'

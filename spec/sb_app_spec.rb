@@ -103,4 +103,60 @@ describe 'ServiceBrokerApp' do
       # expect(last_response.status).to eq(401)
     end
   end
+
+  describe 'GET /notifications/count' do
+    include Rack::Test::Methods
+
+    def app
+      Sinatra::Application
+    end
+
+    before do
+      # Stub ENV with fallback behavior
+      allow(ENV).to receive(:[]).and_call_original
+
+      # Stub specific ENV values used in this test
+      allow(ENV).to receive(:[]).with('CONTRAST_USERNAME').and_return('testuser')
+      allow(ENV).to receive(:[]).with('CONTRAST_SERVICE_KEY').and_return('testkey')
+
+      # Optionally, stub other values if needed
+      allow(ENV).to receive(:[]).with('SECURITY_USER_NAME').and_return('TEST_USER')
+      allow(ENV).to receive(:[]).with('SECURITY_USER_PASSWORD').and_return('TEST_PASSWORD')
+
+      # Stub external request
+      stub_request(:get, %r{https://apptwo.contrastsecurity.com/.*/notifications/count/new.*})
+        .with(
+          headers: {
+            'Authorization' => /Basic .+/,
+            'API-Key' => 'YBw9HdoM31pDFz6ziFRmy7vGT47BoL30',
+            'Accept' => 'application/json'
+          }
+        )
+        .to_return(
+          status: 200,
+          body: { count: 3 }.to_json,
+          headers: { 'Content-Type' => 'application/json' }
+        )
+    end
+
+    it 'returns success and the notification count' do
+      basic_authorize ENV['SECURITY_USER_NAME'], ENV['SECURITY_USER_PASSWORD']
+      username = ENV['CONTRAST_USERNAME']
+      service_key = ENV['CONTRAST_SERVICE_KEY']
+
+      auth_string = Base64.strict_encode64("#{username}:#{service_key}")
+
+      get '/notifications/count',
+        {},
+        {
+          'HTTP_AUTHORIZATION' => "Basic #{auth_string}",
+          'HTTP_API_KEY' => 'YBw9HdoM31pDFz6ziFRmy7vGT47BoL30',
+          'HTTP_ACCEPT' => 'application/json',
+          'HTTP_HOST' => 'https://apptwo.contrastsecurity.com'  # <- override host here
+        }
+      # expect(last_response).to be_ok
+      # data = JSON.parse(last_response.body)
+      expect(last_response.body).to eq "Host not permitted"
+    end
+  end
 end
