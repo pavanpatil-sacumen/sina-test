@@ -105,36 +105,62 @@ class SBApp < Sinatra::Base
 
   get '/notifications/count' do
   	content_type :json
+  	env_keys
 
-	  # Your actual credentials
+  	api_url_to_uri("https://apptwo.contrastsecurity.com/Contrast/api/ng/969321ad-da28-4c8a-9bac-18ca5553b301/notifications/count/new?expand=skip_links")
+	  set_req_headers(@uri)
+	  get_a_response_for_req(@req)
+
+	  if @res.is_a?(Net::HTTPSuccess)
+	    body = JSON.parse(@res.body)
+	    { success: true, count: body["count"] }.to_json
+	  else
+	    status @res.code.to_i
+	    { success: false, error: "Failed to fetch notifications" }.to_json
+	  end
+  end
+
+  get '/notifications/expand' do
+  	content_type :json
+  	env_keys
+
+	  api_url_to_uri("https://apptwo.contrastsecurity.com/Contrast/api/ng/969321ad-da28-4c8a-9bac-18ca5553b301/notifications?expand=skip_links&limit=10&offset=0")
+	  set_req_headers(@uri)
+	  get_a_response_for_req(@req)
+
+	  if @res.is_a?(Net::HTTPSuccess)
+	    body = JSON.parse(@res.body)
+	    { success: true, data: body }.to_json
+	  else
+	    status @res.code.to_i
+	    { success: false, error: "Failed to fetch notifications" }.to_json
+	  end
+  end
+
+  private
+
+  def env_keys
 	  username = ENV['CONTRAST_USERNAME']
 	  service_key = ENV['CONTRAST_SERVICE_KEY']
 
-	  # Encode credentials as Base64 (like btoa in Node)
-  	auth_string = Base64.strict_encode64("#{username}:#{service_key}")
+  	@auth_string = Base64.strict_encode64("#{username}:#{service_key}")
+  end
 
-  	# API URL
-	  api_url = "https://apptwo.contrastsecurity.com/Contrast/api/ng/969321ad-da28-4c8a-9bac-18ca5553b301/notifications/count/new?expand=skip_links"
-	  uri = URI(api_url)
+  def api_url_to_uri(api_url)
+  	@uri = URI(api_url)
+  end
 
-	  # Set up the request
-	  req = Net::HTTP::Get.new(uri)
-	  req['Authorization'] = "Basic #{auth_string}"
-	  req['API-Key'] = "YBw9HdoM31pDFz6ziFRmy7vGT47BoL30"
-	  req['Accept'] = 'application/json'
+  def set_req_headers(uri)
+  	@req = Net::HTTP::Get.new(uri)
+	  @req['Authorization'] = "Basic #{@auth_string}"
+	  @req['API-Key'] = "YBw9HdoM31pDFz6ziFRmy7vGT47BoL30"
+	  @req['Accept'] = 'application/json'
+	  @req
+  end
 
-	  # Make the HTTP call
-	  res = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
-	    http.request(req)
-	  end
-
-	  # Parse and return response
-	  if res.is_a?(Net::HTTPSuccess)
-	    body = JSON.parse(res.body)
-	    { success: true, count: body["count"] }.to_json
-	  else
-	    status res.code.to_i
-	    { success: false, error: "Failed to fetch notifications" }.to_json
+  def get_a_response_for_req(req)
+  	@res = Net::HTTP.start(@uri.hostname, @uri.port, use_ssl: true) do |http|
+	    http.request(@req)
 	  end
   end
 end
