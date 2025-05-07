@@ -135,16 +135,12 @@ describe 'ServiceBrokerApp' do
         .to_return(
           status: 200,
           body: { count: 3 }.to_json,
-          headers: { 'Content-Type' => 'application/json' }
+          headers: { 'content-type' => 'application/json' }
         )
     end
 
     it 'returns success and the notification count' do
       basic_authorize ENV['SECURITY_USER_NAME'], ENV['SECURITY_USER_PASSWORD']
-      username = ENV['CONTRAST_USERNAME']
-      service_key = ENV['CONTRAST_SERVICE_KEY']
-
-      auth_string = Base64.strict_encode64("#{username}:#{service_key}")
 
       get '/notifications/count'
       expect(last_response).to be_ok

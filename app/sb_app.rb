@@ -16,7 +16,7 @@ require 'sinatra'
 require 'net/http'
 require 'uri'
 require 'base64'
-require_relative 'lib/host_authorization'
+# require_relative 'lib/host_authorization'
 
 class SBApp < Sinatra::Base
 	use Rack::JSONBodyParser # middleware so we can get post body data via 'params' variable
@@ -25,7 +25,7 @@ class SBApp < Sinatra::Base
   configure :production, :development do
     enable :logging
     # use HostAuthorization, ['apptwo.contrastsecurity.com', 'localhost:4567']
-    use HostAuthorization, ['localhost', 'apptwo.contrastsecurity.com', 'example.org']
+    # use HostAuthorization, ['localhost', 'apptwo.contrastsecurity.com', 'example.org']
   end
 
   # configure :test do
@@ -37,12 +37,13 @@ class SBApp < Sinatra::Base
     username == ENV['SECURITY_USER_NAME'] && password == ENV['SECURITY_USER_PASSWORD']
   end
 
-  before do
-	  unless settings.environment == :test
-	    allowed_hosts = ['apptwo.contrastsecurity.com']
-	    halt 403, 'Host not permitted' unless allowed_hosts.include?(request.host)
-	  end
-	end
+  # before do
+  # 	byebug
+	#   if settings.environment == :test
+	#     allowed_hosts = ['apptwo.contrastsecurity.com', 'localhost:4567']
+	#     halt 403, 'Host not permitted' unless allowed_hosts.include?(request.host)
+	#   end
+	# end
 
   get '/v2/catalog' do
 	  content_type :json
