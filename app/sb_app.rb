@@ -16,6 +16,7 @@ require 'sinatra'
 require 'net/http'
 require 'uri'
 require 'base64'
+require_relative 'lib/host_authorization'
 
 class SBApp < Sinatra::Base
 	use Rack::JSONBodyParser # middleware so we can get post body data via 'params' variable
@@ -23,7 +24,13 @@ class SBApp < Sinatra::Base
 	# Enable logging(In Pivotal we want to log to STDOUT so loggregator can consume)
   configure :production, :development do
     enable :logging
+    # use HostAuthorization, ['apptwo.contrastsecurity.com', 'localhost:4567']
+    use HostAuthorization, ['localhost', 'apptwo.contrastsecurity.com', 'example.org']
   end
+
+  # configure :test do
+	#   disable :protection  # If using Sinatra's built-in protection
+	# end
 
   # Setup Basic Auth - In Pivotal environment variables will be bound to the application for auth
   use Rack::Auth::Basic do |username, password|

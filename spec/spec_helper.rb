@@ -48,4 +48,7 @@ RSpec.configure do |config|
   ENV['SECURITY_USER_PASSWORD'] = 'TEST_PASSWORD'
   ENV['CONTRAST_USERNAME'] = 'pavan.patil@sacumen.com'
   ENV['CONTRAST_SERVICE_KEY'] = 'ADORTRKUUKL15YNU'
+  config.before(:suite) do
+    SBApp.middleware.delete_if { |m| m[0] == HostAuthorization }
+  end
 end

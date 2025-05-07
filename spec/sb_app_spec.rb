@@ -146,16 +146,9 @@ describe 'ServiceBrokerApp' do
 
       auth_string = Base64.strict_encode64("#{username}:#{service_key}")
 
-      get '/notifications/count',
-        {},
-        {
-          'HTTP_AUTHORIZATION' => "Basic #{auth_string}",
-          'HTTP_API_KEY' => 'YBw9HdoM31pDFz6ziFRmy7vGT47BoL30',
-          'HTTP_ACCEPT' => 'application/json',
-          'HTTP_HOST' => 'https://apptwo.contrastsecurity.com'  # <- override host here
-        }
-      # expect(last_response).to be_ok
-      # data = JSON.parse(last_response.body)
+      get '/notifications/count'
+      expect(last_response).to be_ok
+      data = JSON.parse(last_response.body)
       expect(last_response.body).to eq "Host not permitted"
     end
   end
