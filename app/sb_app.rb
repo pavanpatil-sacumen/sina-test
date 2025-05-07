@@ -137,6 +137,23 @@ class SBApp < Sinatra::Base
 	  end
   end
 
+  put '/notifications/read' do
+  	content_type :json
+  	env_keys
+
+  	api_url_to_uri("https://apptwo.contrastsecurity.com/Contrast/api/ng/969321ad-da28-4c8a-9bac-18ca5553b301/notifications/read")
+	  set_req_headers_put(@uri)
+	  get_a_response_for_req(@req)
+
+	  if @res.is_a?(Net::HTTPSuccess)
+	    body = JSON.parse(@res.body)
+	    { success: true, data: body }.to_json
+	  else
+	    status @res.code.to_i
+	    { success: false, error: "Failed to fetch notifications" }.to_json
+	  end
+  end
+
   private
 
   def env_keys
@@ -152,6 +169,14 @@ class SBApp < Sinatra::Base
 
   def set_req_headers(uri)
   	@req = Net::HTTP::Get.new(uri)
+	  @req['Authorization'] = "Basic #{@auth_string}"
+	  @req['API-Key'] = "YBw9HdoM31pDFz6ziFRmy7vGT47BoL30"
+	  @req['Accept'] = 'application/json'
+	  @req
+  end
+
+  def set_req_headers_put(uri)
+  	@req = Net::HTTP::Put.new(uri)
 	  @req['Authorization'] = "Basic #{@auth_string}"
 	  @req['API-Key'] = "YBw9HdoM31pDFz6ziFRmy7vGT47BoL30"
 	  @req['Accept'] = 'application/json'
