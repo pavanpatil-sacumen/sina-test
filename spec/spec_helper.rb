@@ -14,7 +14,10 @@ require 'webmock/rspec'
 
 ENV['RACK_ENV'] = 'test'
 
-WebMock.disable_net_connect!(allow_localhost: false)
+WebMock.disable_net_connect!(
+  allow_localhost: true,
+  allow: ['apptwo.contrastsecurity.com']
+)
 
 module RSpecMixin
   include Rack::Test::Methods

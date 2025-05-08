@@ -1,0 +1,1 @@
+web: bundle exec rerun 'rackup -p $PORT'

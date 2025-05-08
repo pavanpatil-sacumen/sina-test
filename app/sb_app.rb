@@ -4,46 +4,33 @@ require 'pry'
 require 'byebug'
 require 'json'
 require 'yaml'
-
 require 'model'
 require 'catalog'
 require 'teamserver'
-
 require 'rack'
 require 'rack/contrib'
-
 require 'sinatra'
 require 'net/http'
 require 'uri'
 require 'base64'
-# require_relative 'lib/host_authorization'
 
 class SBApp < Sinatra::Base
-	use Rack::JSONBodyParser # middleware so we can get post body data via 'params' variable
+	puts "Running ruby version: #{RUBY_VERSION}"
+	puts "Running sinatra version: #{Sinatra::VERSION}"
 
-	# Enable logging(In Pivotal we want to log to STDOUT so loggregator can consume)
-  configure :production, :development do
+	use Rack::JSONBodyParser
+
+  configure :production, :development, :test do
     enable :logging
-    # use HostAuthorization, ['apptwo.contrastsecurity.com', 'localhost:4567']
-    # use HostAuthorization, ['localhost', 'apptwo.contrastsecurity.com', 'example.org']
+    before do
+      allowed = ['http://59b26d82.ngrok.io', 'localhost', 'https://apptwo.contrastsecurity.com', 'example.org']
+      halt 403, 'Host not permitted' unless allowed.include?(request.host)
+    end
   end
 
-  # configure :test do
-	#   disable :protection  # If using Sinatra's built-in protection
-	# end
-
-  # Setup Basic Auth - In Pivotal environment variables will be bound to the application for auth
   use Rack::Auth::Basic do |username, password|
     username == ENV['SECURITY_USER_NAME'] && password == ENV['SECURITY_USER_PASSWORD']
   end
-
-  # before do
-  # 	byebug
-	#   if settings.environment == :test
-	#     allowed_hosts = ['apptwo.contrastsecurity.com', 'localhost:4567']
-	#     halt 403, 'Host not permitted' unless allowed_hosts.include?(request.host)
-	#   end
-	# end
 
   get '/v2/catalog' do
 	  content_type :json
@@ -54,12 +41,10 @@ class SBApp < Sinatra::Base
 	put '/v2/service_instances/:id' do |id|
 		content_type :json
     plan_id = params[:plan_id]
-
     plan = Catalog.instance.find_plan(plan_id)
     logger.info "Provision Request Received: Plan: #{plan_id} - Service Instance ID: #{id}"
     response = Teamserver.provision(id, plan.credentials)
-    # if response.code == 201 || ENV['CONTRAST_BACKWARDS_COMPAT']
-    if response.code == 201
+    if response.code == 201 || ENV['CONTRAST_BACKWARDS_COMPAT']
     	status 201
       {}.to_json
     else
@@ -120,39 +105,39 @@ class SBApp < Sinatra::Base
 	  end
   end
 
-  get '/notifications/expand' do
-  	content_type :json
-  	env_keys
+  # get '/notifications/expand' do
+  # 	content_type :json
+  # 	env_keys
 
-	  api_url_to_uri("https://apptwo.contrastsecurity.com/Contrast/api/ng/969321ad-da28-4c8a-9bac-18ca5553b301/notifications?expand=skip_links&limit=10&offset=0")
-	  set_req_headers(@uri)
-	  get_a_response_for_req(@req)
+	#   api_url_to_uri("https://apptwo.contrastsecurity.com/Contrast/api/ng/969321ad-da28-4c8a-9bac-18ca5553b301/notifications?expand=skip_links&limit=10&offset=0")
+	#   set_req_headers(@uri)
+	#   get_a_response_for_req(@req)
 
-	  if @res.is_a?(Net::HTTPSuccess)
-	    body = JSON.parse(@res.body)
-	    { success: true, data: body }.to_json
-	  else
-	    status @res.code.to_i
-	    { success: false, error: "Failed to fetch notifications" }.to_json
-	  end
-  end
+	#   if @res.is_a?(Net::HTTPSuccess)
+	#     body = JSON.parse(@res.body)
+	#     { success: true, data: body }.to_json
+	#   else
+	#     status @res.code.to_i
+	#     { success: false, error: "Failed to fetch notifications" }.to_json
+	#   end
+  # end
 
-  put '/notifications/read' do
-  	content_type :json
-  	env_keys
+  # put '/notifications/read' do
+  # 	content_type :json
+  # 	env_keys
 
-  	api_url_to_uri("https://apptwo.contrastsecurity.com/Contrast/api/ng/969321ad-da28-4c8a-9bac-18ca5553b301/notifications/read")
-	  set_req_headers_put(@uri)
-	  get_a_response_for_req(@req)
+  # 	api_url_to_uri("https://apptwo.contrastsecurity.com/Contrast/api/ng/969321ad-da28-4c8a-9bac-18ca5553b301/notifications/read")
+	#   set_req_headers_put(@uri)
+	#   get_a_response_for_req(@req)
 
-	  if @res.is_a?(Net::HTTPSuccess)
-	    body = JSON.parse(@res.body)
-	    { success: true, data: body }.to_json
-	  else
-	    status @res.code.to_i
-	    { success: false, error: "Failed to fetch notifications" }.to_json
-	  end
-  end
+	#   if @res.is_a?(Net::HTTPSuccess)
+	#     body = JSON.parse(@res.body)
+	#     { success: true, data: body }.to_json
+	#   else
+	#     status @res.code.to_i
+	#     { success: false, error: "Failed to fetch notifications" }.to_json
+	#   end
+  # end
 
   private
 

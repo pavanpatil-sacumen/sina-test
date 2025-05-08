@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'ServiceBrokerApp' do
+describe 'SBApp' do
   class Response
     attr_reader :code
     def initialize c
@@ -15,20 +15,18 @@ describe 'ServiceBrokerApp' do
   describe '/v2/catalog' do
     it 'returns catalog with correct auth given' do
       basic_authorize ENV['SECURITY_USER_NAME'], ENV['SECURITY_USER_PASSWORD']
-      get '/v2/catalog'
-      last_response
-      # expect(last_response).to be_ok
-
-      # body = JSON.parse(last_response.body)
-      # expect(body['services']).to_not be_nil
-      # expect(body['services'].first['plans'].length).to eq(2)
+      get '/v2/catalog', {}, { 'HTTP_HOST' => 'http://59b26d82.ngrok.io' }
+      body = JSON.parse(last_response.body)
+      expect(body['services']).to_not be_nil
+      expect(body['services'].first['plans'].length).to eq(2)
+      expect(last_response).to be_ok
     end
 
     it 'returns empty body with incorrect auth given' do
       basic_authorize 'bad', 'bad'
       get '/v2/catalog'
-      # expect(last_response).to_not be_ok
-      # expect(last_response.body).to be_empty
+      expect(last_response).to_not be_ok
+      expect(last_response.body).to be_empty
     end
   end
 
@@ -39,8 +37,8 @@ describe 'ServiceBrokerApp' do
       basic_authorize ENV['SECURITY_USER_NAME'], ENV['SECURITY_USER_PASSWORD']
       put "/v2/service_instances/#{service_instance_id}",{plan_id: '00000000-1111-2222-3333-000000000000'}
 
-      # expect(last_response.status).to eq(201)
-      # expect(JSON.parse(last_response.body)).to be_empty
+      expect(last_response.status).to eq(201)
+      expect(JSON.parse(last_response.body)).to be_empty
     end
 
     it 'returns success for deleting a service instance id' do
@@ -49,17 +47,17 @@ describe 'ServiceBrokerApp' do
       basic_authorize ENV['SECURITY_USER_NAME'], ENV['SECURITY_USER_PASSWORD']
       delete "/v2/service_instances/#{service_instance_id}",{plan_id: '00000000-1111-2222-3333-000000000000'}
 
-      # expect(last_response.status).to eq(200)
-      # expect(JSON.parse(last_response.body)).to be_empty
+      expect(last_response.status).to eq(200)
+      expect(JSON.parse(last_response.body)).to be_empty
     end
 
     it 'returns failure  - incorrect auth given' do
       basic_authorize 'bad', 'bad'
       put "/v2/service_instances/#{service_instance_id}",{plan_id: '00000000-1111-2222-3333-000000000000'}
-      # expect(last_response.status).to eq(401)
+      expect(last_response.status).to eq(401)
 
       delete "/v2/service_instances/#{service_instance_id}",{plan_id: '00000000-1111-2222-3333-000000000000'}
-      # expect(last_response.status).to eq(401)
+      expect(last_response.status).to eq(401)
     end
   end
 
@@ -69,20 +67,20 @@ describe 'ServiceBrokerApp' do
       basic_authorize ENV['SECURITY_USER_NAME'], ENV['SECURITY_USER_PASSWORD']
       put "/v2/service_instances/#{service_instance_id}/service_bindings/123",{plan_id: '00000000-1111-2222-3333-000000000000'}
 
-      # expect(last_response.status).to eq(200)
-      # result = JSON.parse(last_response.body)
+      expect(last_response.status).to eq(200)
+      result = JSON.parse(last_response.body)
 
-      # expect(result).to be_a(Hash)
+      expect(result).to be_a(Hash)
 
-      # creds = result['credentials']
-      # expect(creds).to be_a(Hash)
-      # expect(creds.size).to eq(5)
+      creds = result['credentials']
+      expect(creds).to be_a(Hash)
+      expect(creds.size).to eq(5)
 
-      # expect(creds['teamserver_url']).to eq('https://app.contrastsecurity.com')
-      # expect(creds['username']).to eq('agent-00000000-1111-2222-3333-000000000000@contrastsecurity')
-      # expect(creds['api_key']).to eq('demo')
-      # expect(creds['service_key']).to eq('demo')
-      # expect(creds['org_uuid']).to eq('00000000-1111-2222-3333-000000000000')
+      expect(creds['teamserver_url']).to eq('https://app.contrastsecurity.com')
+      expect(creds['username']).to eq('agent-00000000-1111-2222-3333-000000000000@contrastsecurity')
+      expect(creds['api_key']).to eq('demo')
+      expect(creds['service_key']).to eq('demo')
+      expect(creds['org_uuid']).to eq('00000000-1111-2222-3333-000000000000')
     end
 
     it 'returns success for deleting a binding' do
@@ -90,62 +88,37 @@ describe 'ServiceBrokerApp' do
       basic_authorize ENV['SECURITY_USER_NAME'], ENV['SECURITY_USER_PASSWORD']
       delete "/v2/service_instances/#{service_instance_id}/service_bindings/123", {plan_id: '00000000-1111-2222-3333-000000000000'}
 
-      # expect(last_response.status).to eq(200)
-      # expect(JSON.parse(last_response.body)).to be_empty
+      expect(last_response.status).to eq(200)
+      expect(JSON.parse(last_response.body)).to be_empty
     end
 
     it 'returns failure  - incorrect auth given' do
       basic_authorize 'bad', 'bad'
       put "/v2/service_instances/#{service_instance_id}/service_bindings/123", {plan_id: '00000000-1111-2222-3333-000000000000'}
-      # expect(last_response.status).to eq(401)
+      expect(last_response.status).to eq(401)
 
       delete "/v2/service_instances/#{service_instance_id}/service_bindings/123", {plan_id: '00000000-1111-2222-3333-000000000000'}
-      # expect(last_response.status).to eq(401)
+      expect(last_response.status).to eq(401)
     end
   end
 
   describe 'GET /notifications/count' do
-    include Rack::Test::Methods
-
-    def app
-      Sinatra::Application
-    end
-
-    before do
-      # Stub ENV with fallback behavior
-      allow(ENV).to receive(:[]).and_call_original
-
-      # Stub specific ENV values used in this test
-      allow(ENV).to receive(:[]).with('CONTRAST_USERNAME').and_return('testuser')
-      allow(ENV).to receive(:[]).with('CONTRAST_SERVICE_KEY').and_return('testkey')
-
-      # Optionally, stub other values if needed
-      allow(ENV).to receive(:[]).with('SECURITY_USER_NAME').and_return('TEST_USER')
-      allow(ENV).to receive(:[]).with('SECURITY_USER_PASSWORD').and_return('TEST_PASSWORD')
-
-      # Stub external request
-      stub_request(:get, %r{https://apptwo.contrastsecurity.com/.*/notifications/count/new.*})
-        .with(
-          headers: {
-            'Authorization' => /Basic .+/,
-            'API-Key' => 'YBw9HdoM31pDFz6ziFRmy7vGT47BoL30',
-            'Accept' => 'application/json'
-          }
-        )
-        .to_return(
-          status: 200,
-          body: { count: 3 }.to_json,
-          headers: { 'content-type' => 'application/json' }
-        )
-    end
-
     it 'returns success and the notification count' do
       basic_authorize ENV['SECURITY_USER_NAME'], ENV['SECURITY_USER_PASSWORD']
-
-      get '/notifications/count'
+      get '/notifications/count', {}, { 'HTTP_HOST' => 'https://apptwo.contrastsecurity.com' }
       expect(last_response).to be_ok
       data = JSON.parse(last_response.body)
-      expect(last_response.body).to eq "Host not permitted"
+      expect(data['success']).to eq true
+      expect(data['count']).to eq 14
     end
+  end
+
+  private
+
+  def env_keys
+    username = ENV['CONTRAST_USERNAME']
+    service_key = ENV['CONTRAST_SERVICE_KEY']
+
+    @auth_string = Base64.strict_encode64("#{username}:#{service_key}")
   end
 end
