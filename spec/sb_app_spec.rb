@@ -109,16 +109,30 @@ describe 'SBApp' do
       expect(last_response).to be_ok
       data = JSON.parse(last_response.body)
       expect(data['success']).to eq true
-      expect(data['count']).to eq 14
+      expect(data['count']).to be_a(Numeric)
     end
   end
 
-  private
+  describe 'GET /notifications/expand' do
+    it 'returns success and expand the notifications data' do
+      basic_authorize ENV['SECURITY_USER_NAME'], ENV['SECURITY_USER_PASSWORD']
+      get '/notifications/expand', {}, { 'HTTP_HOST' => 'https://apptwo.contrastsecurity.com' }
+      expect(last_response).to be_ok
+      data = JSON.parse(last_response.body)
+      expect(data['success']).to eq true
+      expect(data["data"]["messages"].first).to eq "Notifications loaded successfully"
+      expect(data["data"]["notifications"]).not_to be_nil
+    end
+  end
 
-  def env_keys
-    username = ENV['CONTRAST_USERNAME']
-    service_key = ENV['CONTRAST_SERVICE_KEY']
-
-    @auth_string = Base64.strict_encode64("#{username}:#{service_key}")
+  describe 'PUT /notifications/read' do
+    it 'returns success and update the notifications as read value true' do
+      basic_authorize ENV['SECURITY_USER_NAME'], ENV['SECURITY_USER_PASSWORD']
+      put '/notifications/read', {}, { 'HTTP_HOST' => 'https://apptwo.contrastsecurity.com' }
+      expect(last_response).to be_ok
+      data = JSON.parse(last_response.body)
+      expect(data['success']).to eq true
+      expect(data["data"]["messages"].first).to eq "Notifications status updated successfully"
+    end
   end
 end

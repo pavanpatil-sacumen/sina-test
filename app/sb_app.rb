@@ -105,39 +105,39 @@ class SBApp < Sinatra::Base
 	  end
   end
 
-  # get '/notifications/expand' do
-  # 	content_type :json
-  # 	env_keys
+  get '/notifications/expand' do
+  	content_type :json
+  	env_keys
 
-	#   api_url_to_uri("https://apptwo.contrastsecurity.com/Contrast/api/ng/969321ad-da28-4c8a-9bac-18ca5553b301/notifications?expand=skip_links&limit=10&offset=0")
-	#   set_req_headers(@uri)
-	#   get_a_response_for_req(@req)
+	  api_url_to_uri("https://apptwo.contrastsecurity.com/Contrast/api/ng/969321ad-da28-4c8a-9bac-18ca5553b301/notifications?expand=skip_links&limit=10&offset=0")
+	  set_req_headers(@uri)
+	  get_a_response_for_req(@req)
 
-	#   if @res.is_a?(Net::HTTPSuccess)
-	#     body = JSON.parse(@res.body)
-	#     { success: true, data: body }.to_json
-	#   else
-	#     status @res.code.to_i
-	#     { success: false, error: "Failed to fetch notifications" }.to_json
-	#   end
-  # end
+	  if @res.is_a?(Net::HTTPSuccess)
+	    body = JSON.parse(@res.body)
+	    { success: true, data: body }.to_json
+	  else
+	    status @res.code.to_i
+	    { success: false, error: "Failed to fetch notifications" }.to_json
+	  end
+  end
 
-  # put '/notifications/read' do
-  # 	content_type :json
-  # 	env_keys
+  put '/notifications/read' do
+  	content_type :json
+  	env_keys
 
-  # 	api_url_to_uri("https://apptwo.contrastsecurity.com/Contrast/api/ng/969321ad-da28-4c8a-9bac-18ca5553b301/notifications/read")
-	#   set_req_headers_put(@uri)
-	#   get_a_response_for_req(@req)
+  	api_url_to_uri("https://apptwo.contrastsecurity.com/Contrast/api/ng/969321ad-da28-4c8a-9bac-18ca5553b301/notifications/read")
+	  set_req_headers_put(@uri)
+	  get_a_response_for_req(@req)
 
-	#   if @res.is_a?(Net::HTTPSuccess)
-	#     body = JSON.parse(@res.body)
-	#     { success: true, data: body }.to_json
-	#   else
-	#     status @res.code.to_i
-	#     { success: false, error: "Failed to fetch notifications" }.to_json
-	#   end
-  # end
+	  if @res.is_a?(Net::HTTPSuccess)
+	    body = JSON.parse(@res.body)
+	    { success: true, data: body }.to_json
+	  else
+	    status @res.code.to_i
+	    { success: false, error: "Failed to fetch notifications" }.to_json
+	  end
+  end
 
   private
 
