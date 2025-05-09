@@ -4,11 +4,11 @@ describe Teamserver do
   describe 'helpers' do
     let(:credential){
       cred = Model::Credential.new
-      cred.username = 'agent-00000000-1234-1234-1234-1234567890ab@contrastsecurity'
-      cred.service_key = 'YK13LA49HSD1U'
-      cred.api_key = 'demo'
-      cred.teamserver_url = 'https://app.contrastsecurity.com'
-      cred.org_uuid = '00000000-1234-1234-1234-1234567890ab'
+      cred.username = 'agent_82a33db8-8738-4026-b891-a2b2764d7fb9@ContrastSecurity'
+      cred.service_key = '38D6O7PHW5KJANYH'
+      cred.api_key = 'YBw9HdoM31pDFz6ziFRmy7vGT47BoL30'
+      cred.teamserver_url = 'http://59b26d82.ngrok.io'
+      cred.org_uuid = '969321ad-da28-4c8a-9bac-18ca5553b301'
       cred
     }
 
@@ -18,15 +18,15 @@ describe Teamserver do
 
     it 'can build correct Authorization value' do
       auth = Teamserver.build_authorization(credential)
-      expect(auth).to eq('YWdlbnQtMDAwMDAwMDAtMTIzNC0xMjM0LTEyMzQtMTIzNDU2Nzg5MGFiQGNvbnRyYXN0c2VjdXJpdHk6WUsxM0xBNDlIU0QxVQ==')
+      expect(auth).to eq('YWdlbnRfODJhMzNkYjgtODczOC00MDI2LWI4OTEtYTJiMjc2NGQ3ZmI5QENvbnRyYXN0U2VjdXJpdHk6MzhENk83UEhXNUtKQU5ZSA==')
     end
 
     it 'can build correct headers' do
       headers = Teamserver.build_headers(credential)
       expect(headers).to be_a(Hash)
       expect(headers.keys.length).to eq(3)
-      expect(headers[:'API-Key']).to eq('demo')
-      expect(headers[:Authorization]).to eq('YWdlbnQtMDAwMDAwMDAtMTIzNC0xMjM0LTEyMzQtMTIzNDU2Nzg5MGFiQGNvbnRyYXN0c2VjdXJpdHk6WUsxM0xBNDlIU0QxVQ==')
+      expect(headers[:'API-Key']).to eq('YBw9HdoM31pDFz6ziFRmy7vGT47BoL30')
+      expect(headers[:Authorization]).to eq('YWdlbnRfODJhMzNkYjgtODczOC00MDI2LWI4OTEtYTJiMjc2NGQ3ZmI5QENvbnRyYXN0U2VjdXJpdHk6MzhENk83UEhXNUtKQU5ZSA==')
       expect(headers[:'Content-Type']).to eq('application/json')
     end
 
@@ -186,9 +186,9 @@ describe Teamserver do
       cred = Model::Credential.new
       cred.username = 'agent-00000000-1234-1234-1234-1234567890ab@contrastsecurity'
       cred.service_key = 'YK13LA49HSD1U'
-      cred.api_key = 'demo'
-      cred.teamserver_url = 'https://app.contrastsecurity.com'
-      cred.org_uuid = '00000000-1234-1234-1234-1234567890ab'
+      cred.api_key = 'YBw9HdoM31pDFz6ziFRmy7vGT47BoL30'
+      cred.teamserver_url = 'http://59b26d82.ngrok.io'
+      cred.org_uuid = '969321ad-da28-4c8a-9bac-18ca5553b301'
       cred
     }
 
@@ -197,21 +197,21 @@ describe Teamserver do
     }
 
     it 'can build appropriate provisioning request' do
-      allow(HTTParty).to receive(:post).with(anything).and_return({success: true})
-      # expect(HTTParty).to receive(:post).with('https://app.contrastsecurity.com/Contrast/api/ng/pivotal/instances/f78a7694-0835-11e8-ba89-0ed5f89f718b', :body => {organizationUuid: credential.org_uuid}.to_json, :headers => anything)
-      # Teamserver.provision(service_instance_id, credential)
+      allow(HTTParty).to receive(:post).and_return({success: true})
+      expect(HTTParty).to receive(:post)
+      Teamserver.provision(service_instance_id, credential)
     end
 
     it 'can build appropriate binding request' do
-      allow(HTTParty).to receive(:post).with(anything).and_return({success: true})
-      # expect(HTTParty).to receive(:post).with('https://app.contrastsecurity.com/Contrast/api/ng/pivotal/instances/f78a7694-0835-11e8-ba89-0ed5f89f718b/bindings/1',:body => {organizationUuid: credential.org_uuid}.to_json, :headers => anything)
-      # Teamserver.bind(service_instance_id,'1', credential)
+      allow(HTTParty).to receive(:post).and_return({success: true})
+      expect(HTTParty).to receive(:post)
+      Teamserver.bind(service_instance_id,'1', credential)
     end
 
     it 'can build appropriate unprovisioning request' do
-      allow(HTTParty).to receive(:delete).with(anything).and_return({success: true})
-      # expect(HTTParty).to receive(:delete).with('https://app.contrastsecurity.com/Contrast/api/ng/pivotal/instances/f78a7694-0835-11e8-ba89-0ed5f89f718b', :headers => anything)
-      # Teamserver.unprovision(service_instance_id, credential)
+      allow(HTTParty).to receive(:delete).and_return({success: true})
+      expect(HTTParty).to receive(:delete)
+      Teamserver.unprovision(service_instance_id, credential)
     end
   end
 end
