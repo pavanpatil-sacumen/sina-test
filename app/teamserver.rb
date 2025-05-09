@@ -3,7 +3,7 @@ require 'base64'
 require 'json'
 
 class Teamserver
-  BASE_PATH = '/ng/pivotal'
+  BASE_PATH = '/ng/pivotal'.freeze
 
   # For Provisioning
   def self.provision service_instance_id, credential
