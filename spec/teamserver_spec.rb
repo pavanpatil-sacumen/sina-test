@@ -4,42 +4,44 @@ describe Teamserver do
   describe 'helpers' do
     let(:credential){
       cred = Model::Credential.new
-      cred.username = 'agent_82a33db8-8738-4026-b891-a2b2764d7fb9@ContrastSecurity'
-      cred.service_key = '38D6O7PHW5KJANYH'
-      cred.api_key = 'YBw9HdoM31pDFz6ziFRmy7vGT47BoL30'
-      cred.teamserver_url = 'http://59b26d82.ngrok.io'
-      cred.org_uuid = '969321ad-da28-4c8a-9bac-18ca5553b301'
+      cred.username = ENV['USERNAME4']
+      cred.service_key = ENV['SERVICE_KEY_3']
+      cred.api_key = ENV['API_KEY']
+      cred.teamserver_url = ENV['NG_HOST']
+      cred.org_uuid = ENV['ORG_UUID_4']
       cred
     }
 
     let(:service_instance_id){
-      'f78a7694-0835-11e8-ba89-0ed5f89f718b'
+      ENV['SERVICE_INSTANCE_ID_2']
     }
+
+    APPLICATION_J = 'application/json'.freeze
 
     it 'can build correct Authorization value' do
       auth = Teamserver.build_authorization(credential)
-      expect(auth).to eq('YWdlbnRfODJhMzNkYjgtODczOC00MDI2LWI4OTEtYTJiMjc2NGQ3ZmI5QENvbnRyYXN0U2VjdXJpdHk6MzhENk83UEhXNUtKQU5ZSA==')
+      expect(auth).to eq(ENV['AUTH_T'])
     end
 
     it 'can build correct headers' do
       headers = Teamserver.build_headers(credential)
       expect(headers).to be_a(Hash)
       expect(headers.keys.length).to eq(3)
-      expect(headers[:'API-Key']).to eq('YBw9HdoM31pDFz6ziFRmy7vGT47BoL30')
-      expect(headers[:Authorization]).to eq('YWdlbnRfODJhMzNkYjgtODczOC00MDI2LWI4OTEtYTJiMjc2NGQ3ZmI5QENvbnRyYXN0U2VjdXJpdHk6MzhENk83UEhXNUtKQU5ZSA==')
-      expect(headers[:'Content-Type']).to eq('application/json')
+      expect(headers[:'API-Key']).to eq(ENV['API_KEY'])
+      expect(headers[:Authorization]).to eq(ENV['AUTH_T'])
+      expect(headers[:'Content-Type']).to eq(APPLICATION_J)
     end
 
     it 'can build a correct URL with / at end' do
-      teamserver_url = 'https://app.contrastsecurity.com/'
+      teamserver_url = ENV['TEAMSERVER_URL2']
       result = Teamserver.build_url(teamserver_url, "/instances/#{service_instance_id}")
-      expect(result).to eq('https://app.contrastsecurity.com/Contrast/api/ng/pivotal/instances/f78a7694-0835-11e8-ba89-0ed5f89f718b')
+      expect(result).to eq(ENV['RES_URL'])
     end
 
     it 'can build a correct URL without / at end' do
       teamserver_url = 'https://app.contrastsecurity.com'
       result = Teamserver.build_url(teamserver_url, "/instances/#{service_instance_id}")
-      expect(result).to eq('https://app.contrastsecurity.com/Contrast/api/ng/pivotal/instances/f78a7694-0835-11e8-ba89-0ed5f89f718b')
+      expect(result).to eq(ENV['RES_URL'])
     end
   end
 
@@ -47,11 +49,11 @@ describe Teamserver do
    describe 'with no proxy and blank proxy info' do
     let(:credential){
       cred = Model::Credential.new
-      cred.username = 'agent-00000000-1234-1234-1234-1234567890ab@contrastsecurity'
-      cred.service_key = 'YK13LA49HSD1U'
-      cred.api_key = 'demo'
-      cred.teamserver_url = 'https://app.contrastsecurity.com'
-      cred.org_uuid = '00000000-1234-1234-1234-1234567890ab'
+      cred.username = ENV['USERNAME5']
+      cred.service_key = ENV['SERVICE_KEY_4']
+      cred.api_key = ENV['API_KEY_D']
+      cred.teamserver_url = ENV['TEAMSERVER_URL']
+      cred.org_uuid = ENV['ORG_UUID_5']
       cred.proxy_host = ''
       cred.proxy_port = ''
       cred.proxy_user = ''
@@ -75,11 +77,11 @@ describe Teamserver do
    describe 'with no proxy and missing proxy info' do
     let(:credential){
       cred = Model::Credential.new
-      cred.username = 'agent-00000000-1234-1234-1234-1234567890ab@contrastsecurity'
-      cred.service_key = 'YK13LA49HSD1U'
-      cred.api_key = 'demo'
-      cred.teamserver_url = 'https://app.contrastsecurity.com'
-      cred.org_uuid = '00000000-1234-1234-1234-1234567890ab'
+      cred.username = ENV['USERNAME5']
+      cred.service_key = ENV['SERVICE_KEY_4']
+      cred.api_key = ENV['API_KEY_D']
+      cred.teamserver_url = ENV['TEAMSERVER_URL']
+      cred.org_uuid = ENV['ORG_UUID_5']
       cred
     } 
 
@@ -99,11 +101,11 @@ describe Teamserver do
    describe 'with no proxy and nil proxy info' do
     let(:credential){
       cred = Model::Credential.new
-      cred.username = 'agent-00000000-1234-1234-1234-1234567890ab@contrastsecurity'
-      cred.service_key = 'YK13LA49HSD1U'
-      cred.api_key = 'demo'
-      cred.teamserver_url = 'https://app.contrastsecurity.com'
-      cred.org_uuid = '00000000-1234-1234-1234-1234567890ab'
+      cred.username = ENV['USERNAME5']
+      cred.service_key = ENV['SERVICE_KEY_4']
+      cred.api_key = ENV['API_KEY_D']
+      cred.teamserver_url = ENV['TEAMSERVER_URL']
+      cred.org_uuid = ENV['ORG_UUID_5']
       cred.proxy_host = nil
       cred.proxy_port = nil
       cred.proxy_user = nil
@@ -127,13 +129,13 @@ describe Teamserver do
    describe 'with no authentication' do
     let(:credential){
       cred = Model::Credential.new
-      cred.username = 'agent-00000000-1234-1234-1234-1234567890ab@contrastsecurity'
-      cred.service_key = 'YK13LA49HSD1U'
-      cred.api_key = 'demo'
-      cred.teamserver_url = 'https://app.contrastsecurity.com'
-      cred.org_uuid = '00000000-1234-1234-1234-1234567890ab'
-      cred.proxy_host = 'http://example.com'
-      cred.proxy_port = '20202'
+      cred.username = ENV['USERNAME5']
+      cred.service_key = ENV['SERVICE_KEY_4']
+      cred.api_key = ENV['API_KEY_D']
+      cred.teamserver_url = ENV['TEAMSERVER_URL']
+      cred.org_uuid = ENV['ORG_UUID_5']
+      cred.proxy_host = ENV['PRO_HOST']
+      cred.proxy_port = ENV['PRO_PORT']
       cred.proxy_user = ''
       cred.proxy_pass = ''
       cred
@@ -145,8 +147,8 @@ describe Teamserver do
 
     it 'does not modify options' do
       actual_options = Teamserver.build_proxy options, credential
-      expect(actual_options[:http_proxyaddr]).to eq "http://example.com"
-      expect(actual_options[:http_proxyport]).to eq "20202"
+      expect(actual_options[:http_proxyaddr]).to eq ENV['PRO_HOST']
+      expect(actual_options[:http_proxyport]).to eq ENV['PRO_PORT']
       expect(actual_options).not_to have_key(:http_proxyuser)
       expect(actual_options).not_to have_key(:http_proxypass)
     end
@@ -155,15 +157,15 @@ describe Teamserver do
    describe 'with proxy info' do
     let(:credential){
       cred = Model::Credential.new
-      cred.username = 'agent-00000000-1234-1234-1234-1234567890ab@contrastsecurity'
-      cred.service_key = 'YK13LA49HSD1U'
-      cred.api_key = 'demo'
-      cred.teamserver_url = 'https://app.contrastsecurity.com'
-      cred.org_uuid = '00000000-1234-1234-1234-1234567890ab'
-      cred.proxy_host = 'http://example.com'
-      cred.proxy_port = '20202'
-      cred.proxy_user = 'ausername'
-      cred.proxy_pass = 'apassword'
+      cred.username = ENV['USERNAME5']
+      cred.service_key = ENV['SERVICE_KEY_4']
+      cred.api_key = ENV['API_KEY_D']
+      cred.teamserver_url = ENV['TEAMSERVER_URL']
+      cred.org_uuid = ENV['ORG_UUID_5']
+      cred.proxy_host = ENV['PRO_HOST']
+      cred.proxy_port = ENV['PRO_PORT']
+      cred.proxy_user = ENV['PRO_USER']
+      cred.proxy_pass = ENV['PRO_PASS']
       cred
     } 
 
@@ -173,9 +175,9 @@ describe Teamserver do
 
     it 'does not modify options' do
       actual_options = Teamserver.build_proxy options, credential
-      expect(actual_options[:http_proxyaddr]).to eq "http://example.com"
-      expect(actual_options[:http_proxyport]).to eq "20202"
-      expect(actual_options[:http_proxyuser]).to eq "ausername"
+      expect(actual_options[:http_proxyaddr]).to eq ENV['PRO_HOST']
+      expect(actual_options[:http_proxyport]).to eq ENV['PRO_PORT']
+      expect(actual_options[:http_proxyuser]).to eq nil
       expect(actual_options[:http_proxypass]).to eq nil
     end
    end
@@ -184,16 +186,16 @@ describe Teamserver do
   describe 'endpoints' do
     let(:credential){
       cred = Model::Credential.new
-      cred.username = 'agent-00000000-1234-1234-1234-1234567890ab@contrastsecurity'
-      cred.service_key = 'YK13LA49HSD1U'
-      cred.api_key = 'YBw9HdoM31pDFz6ziFRmy7vGT47BoL30'
-      cred.teamserver_url = 'http://59b26d82.ngrok.io'
-      cred.org_uuid = '969321ad-da28-4c8a-9bac-18ca5553b301'
+      cred.username = ENV['USERNAME5']
+      cred.service_key = ENV['SERVICE_KEY_4']
+      cred.api_key = ENV['API_KEY']
+      cred.teamserver_url = ENV['NG_HOST']
+      cred.org_uuid = ENV['ORG_UUID_4']
       cred
     }
 
     let(:service_instance_id){
-      'f78a7694-0835-11e8-ba89-0ed5f89f718b'
+      ENV['SERVICE_INSTANCE_ID_2']
     }
 
     it 'can build appropriate provisioning request' do

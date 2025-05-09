@@ -1,7 +1,7 @@
 require 'simplecov'
 
 SimpleCov.start do
-  add_filter '/spec/'   # or '/test/', depending on your test folder
+  add_filter '/spec/'
 end
 
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'app'))
@@ -29,26 +29,22 @@ RSpec.configure do |config|
 
   service_plans_env = {
     :ServicePlan1 => {
-      :name => 'ServicePlan1',
-      :teamserver_url => 'https://app.contrastsecurity.com',
-      :username => 'agent-00000000-1111-2222-3333-000000000000@contrastsecurity',
-      :api_key => 'demo',
-      :service_key => 'demo',
-      :org_uuid => '00000000-1111-2222-3333-000000000000'
+      :name => ENV['SERVICEPLAN1'],
+      :teamserver_url => ENV['TEAMSERVER_URL'],
+      :username => ENV['USERNAME2'],
+      :api_key => ENV['API_KEY_D'],
+      :service_key => ENV['SERVICE_KEY_D'],
+      :org_uuid => ENV['ORG_UUID']
     },
     :ServicePlan2 => {
-      :name => 'ServicePlan2',
-      :teamserver_url => 'https://alpha.contrastsecurity.com',
-      :username => 'agent-zzzzzzzz-1111-2222-3333-000000000000@contrastsecurity',
-      :api_key => 'zzzz',
-      :service_key => 'service_zzzz',
-      :org_uuid => 'zzzzzzzz-1111-2222-3333-000000000000'
+      :name => ENV['SERVICEPLAN2'],
+      :teamserver_url => ENV['TEAMSERVER_URL_2'],
+      :username => ENV['USERNAME3'],
+      :api_key => ENV['API_KEY_2'],
+      :service_key => ENV['SERVICE_KEY_2'],
+      :org_uuid => ENV['ORG_UUID2']
     }
   }
 
   ENV['CONTRAST_SERVICE_PLANS'] = service_plans_env.to_json
-  ENV['SECURITY_USER_NAME'] = 'TEST_USER'
-  ENV['SECURITY_USER_PASSWORD'] = 'TEST_PASSWORD'
-  ENV['CONTRAST_USERNAME'] = 'pavan.patil@sacumen.com'
-  ENV['CONTRAST_SERVICE_KEY'] = 'ADORTRKUUKL15YNU'
 end
