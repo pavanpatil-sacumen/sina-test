@@ -2,15 +2,14 @@ require 'spec_helper'
 
 describe Model::Plan do
   describe 'basics' do
-
     let(:hash){
       {
-        'name' => 'ServicePlan1',
-        'teamserver_url' => 'https://app.contrastsecurity.com',
-        'username' => 'agent-00000000-1111-2222-3333-000000000000@contrastsecurity',
-        'api_key' => 'demo',
-        'service_key' => 'demo',
-        'org_uuid' => '00000000-1111-2222-3333-000000000000'
+        'name' => ENV['SERVICEPLAN1'],
+        'teamserver_url' => ENV['TEAMSERVER_URL'],
+        'username' => ENV['USERNAME'],
+        'api_key' => ENV['API_KEY_D'],
+        'service_key' => ENV['SERVICE_KEY_D'],
+        'org_uuid' => ENV['ORG_UUID']
       }
     }
 
