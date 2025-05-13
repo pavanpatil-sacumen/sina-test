@@ -18,7 +18,7 @@ describe 'SBApp' do
   describe '/v2/catalog' do
     it 'returns catalog with correct auth given' do
       valid_auth
-      get '/v2/catalog'
+      get '/v2/catalog', {}, { 'HTTP_HOST' => 'localhost' }
       body = JSON.parse(last_response.body)
       expect(body['services']).to_not be_nil
       expect(body['services'].first['plans'].length).to eq(2)
@@ -27,7 +27,7 @@ describe 'SBApp' do
 
     it 'returns empty body with incorrect auth given' do
       invalid_auth
-      get '/v2/catalog'
+      get '/v2/catalog', {}, { 'HTTP_HOST' => 'localhost' }
       expect(last_response).to_not be_ok
       expect(last_response.body).to be_empty
     end
@@ -38,7 +38,7 @@ describe 'SBApp' do
       allow(Teamserver).to receive(:provision).and_return(Response.new(201))
 
       valid_auth
-      put "/v2/service_instances/#{service_instance_id}",{plan_id: ENV['PLAN_ID']}
+      put "/v2/service_instances/#{service_instance_id}", {plan_id: ENV['PLAN_ID']}, { 'HTTP_HOST' => 'localhost' }
 
       expect(last_response.status).to eq(201)
       expect(JSON.parse(last_response.body)).to be_empty
@@ -48,7 +48,7 @@ describe 'SBApp' do
       allow(Teamserver).to receive(:unprovision).and_return({success: true})
 
       valid_auth
-      delete "/v2/service_instances/#{service_instance_id}",{plan_id: ENV['PLAN_ID']}
+      delete "/v2/service_instances/#{service_instance_id}",{plan_id: ENV['PLAN_ID']}, { 'HTTP_HOST' => 'localhost' }
 
       expect(last_response.status).to eq(200)
       expect(JSON.parse(last_response.body)).to be_empty
@@ -56,10 +56,10 @@ describe 'SBApp' do
 
     it 'returns failure  - incorrect auth given' do
       invalid_auth
-      put "/v2/service_instances/#{service_instance_id}",{plan_id: ENV['PLAN_ID']}
+      put "/v2/service_instances/#{service_instance_id}",{plan_id: ENV['PLAN_ID']}, { 'HTTP_HOST' => 'localhost' }
       expect(last_response.status).to eq(401)
 
-      delete "/v2/service_instances/#{service_instance_id}",{plan_id: ENV['PLAN_ID']}
+      delete "/v2/service_instances/#{service_instance_id}",{plan_id: ENV['PLAN_ID']}, { 'HTTP_HOST' => 'localhost' }
       expect(last_response.status).to eq(401)
     end
   end
@@ -68,7 +68,7 @@ describe 'SBApp' do
     it 'returns a credential for "binding" a service instance' do
       allow(Teamserver).to receive(:bind).and_return(Response.new(201))
       valid_auth
-      put "/v2/service_instances/#{service_instance_id}/service_bindings/123",{plan_id: ENV['PLAN_ID']}
+      put "/v2/service_instances/#{service_instance_id}/service_bindings/123",{plan_id: ENV['PLAN_ID']}, { 'HTTP_HOST' => 'localhost' }
 
       expect(last_response.status).to eq(200)
       result = JSON.parse(last_response.body)
@@ -88,7 +88,7 @@ describe 'SBApp' do
 
     it 'returns success for deleting a binding' do
       valid_auth
-      delete "/v2/service_instances/#{service_instance_id}/service_bindings/123", {plan_id: ENV['PLAN_ID']}
+      delete "/v2/service_instances/#{service_instance_id}/service_bindings/123", {plan_id: ENV['PLAN_ID']}, { 'HTTP_HOST' => 'localhost' }
 
       expect(last_response.status).to eq(200)
       expect(JSON.parse(last_response.body)).to be_empty
@@ -96,10 +96,10 @@ describe 'SBApp' do
 
     it 'returns failure  - incorrect auth given' do
       invalid_auth
-      put "/v2/service_instances/#{service_instance_id}/service_bindings/123", {plan_id: ENV['PLAN_ID']}
+      put "/v2/service_instances/#{service_instance_id}/service_bindings/123", {plan_id: ENV['PLAN_ID']}, { 'HTTP_HOST' => 'localhost' }
       expect(last_response.status).to eq(401)
 
-      delete "/v2/service_instances/#{service_instance_id}/service_bindings/123", {plan_id: ENV['PLAN_ID']}
+      delete "/v2/service_instances/#{service_instance_id}/service_bindings/123", {plan_id: ENV['PLAN_ID']}, { 'HTTP_HOST' => 'localhost' }
       expect(last_response.status).to eq(401)
     end
   end
@@ -107,7 +107,7 @@ describe 'SBApp' do
   describe 'GET /notifications/count' do
     it 'returns success and the notification count' do
       valid_auth
-      get '/notifications/count'
+      get '/notifications/count', {}, { 'HTTP_HOST' => 'localhost' }
       expect(last_response).to be_ok
       data = JSON.parse(last_response.body)
       expect(data['success']).to eq true
@@ -118,7 +118,7 @@ describe 'SBApp' do
   describe 'GET /notifications/expand' do
     it 'returns success and expand the notifications data' do
       valid_auth
-      get '/notifications/expand'
+      get '/notifications/expand', {}, { 'HTTP_HOST' => 'localhost' }
       expect(last_response).to be_ok
       data = JSON.parse(last_response.body)
       expect(data['success']).to eq true
@@ -130,7 +130,7 @@ describe 'SBApp' do
   describe 'PUT /notifications/read' do
     it 'returns success and update the notifications as read value true' do
       valid_auth
-      put '/notifications/read'
+      put '/notifications/read', {}, { 'HTTP_HOST' => 'localhost' }
       expect(last_response).to be_ok
       data = JSON.parse(last_response.body)
       expect(data['success']).to eq true
