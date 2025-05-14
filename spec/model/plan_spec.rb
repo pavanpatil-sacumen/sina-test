@@ -1,9 +1,10 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Model::Plan do
   describe 'basics' do
-
-    let(:hash){
+    let(:hash) do
       {
         'name' => 'ServicePlan1',
         'teamserver_url' => 'https://app.contrastsecurity.com',
@@ -12,7 +13,7 @@ describe Model::Plan do
         'service_key' => 'demo',
         'org_uuid' => '00000000-1111-2222-3333-000000000000'
       }
-    }
+    end
 
     it 'can be built from a hash' do
       plan = Model::Plan.from_hash(hash)
@@ -25,7 +26,6 @@ describe Model::Plan do
       expect(plan.metadata).to be_a(Hash)
       expect(plan.metadata[:bullets]).to be_a(Array)
       expect(plan.metadata[:bullets].length).to eq(3)
-
     end
   end
 end

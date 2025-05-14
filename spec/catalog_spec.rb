@@ -1,8 +1,9 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Catalog do
   describe 'build' do
-
     it 'can be instantiated' do
       expect(Catalog.instance).to_not be_nil
     end
@@ -17,7 +18,6 @@ describe Catalog do
 
       expect(plans[1].name).to eq('ServicePlan2')
       expect(plans[1].id).to eq('zzzzzzzz-1111-2222-3333-000000000000')
-
     end
 
     it 'builds plans with correct credentials' do
@@ -39,6 +39,5 @@ describe Catalog do
       expect(cred2.teamserver_url).to eq('https://alpha.contrastsecurity.com')
       expect(cred2.username).to eq('agent-zzzzzzzz-1111-2222-3333-000000000000@contrastsecurity')
     end
-
   end
 end

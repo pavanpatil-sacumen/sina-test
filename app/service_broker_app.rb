@@ -150,9 +150,19 @@ class ServiceBrokerApp < Sinatra::Base
   # UNBIND
   delete '/v2/service_instances/:instance_id/service_bindings/:id' do |instance_id, binding_id|
     content_type :json
+    plan_id = params[:plan_id]
+
     logger.info "Unbind Request Received for instance #{instance_id}, binding #{binding_id}"
+
+    plan = Catalog.instance.find_plan(plan_id)
+    unless plan
+      logger.warn "Plan not found: #{plan_id}"
+      status 400
+      return { description: 'Invalid plan_id' }.to_json
+    end
+
     begin
-      Teamserver.unbind(instance_id, binding_id)
+      Teamserver.unbind(instance_id, binding_id, plan.credentials)
       status 200
       {}.to_json
     rescue StandardError => e

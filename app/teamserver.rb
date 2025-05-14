@@ -43,16 +43,43 @@ class Teamserver
     execute_with_retry(:post, url, options)
   end
 
+  # def self.execute_with_retry(method, url, options)
+  #   retries = 0
+
+  #   begin
+  #     response = perform_request(method, url, options)
+  #     raise_if_server_error(response)
+  #     handle_response(response)
+  #   rescue StandardError => e
+  #     retry_or_raise(e, retries) { retries += 1 }
+  #     retry
+  #   end
+  # end
+
   def self.execute_with_retry(method, url, options)
     retries = 0
 
     begin
-      response = perform_request(method, url, options)
-      raise_if_server_error(response)
+      log_request(method, url, options)
+      response = HTTParty.send(method, url, options)
+      log_response(response)
+
+      if response.code >= 500
+        raise StandardError, "Server error: #{response.code} - #{response.body}"
+      end
+
       handle_response(response)
-    rescue StandardError => e
-      retry_or_raise(e, retries) { retries += 1 }
-      retry
+    rescue => e
+      if retries < MAX_RETRIES
+        sleep_time = RETRY_BACKOFF**retries
+        LOGGER.warn("Retry #{retries + 1}/#{MAX_RETRIES}: #{e.class} - #{e.message}. Sleeping #{sleep_time}s...")
+        sleep(sleep_time)
+        retries += 1
+        retry
+      else
+        LOGGER.error("Request failed after #{MAX_RETRIES} attempts.")
+        raise TeamserverError, "Teamserver request failed: #{e.message}"
+      end
     end
   end
 
