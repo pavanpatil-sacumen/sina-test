@@ -50,17 +50,6 @@ module Model
       as_json(*options).to_json(*options)
     end
 
-    # Validate that all required fields are present
-    def validate
-      raise 'teamserver_url is required' unless teamserver_url
-      raise 'org_uuid is required' unless org_uuid
-      raise 'api_key is required' unless api_key
-      raise 'service_key is required' unless service_key
-      raise 'username is required' unless username
-
-      true
-    end
-
     private
 
     def attributes_to_json

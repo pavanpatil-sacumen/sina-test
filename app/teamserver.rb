@@ -21,13 +21,6 @@ class Teamserver
     post_instance("/instances/#{service_instance_id}/bindings/#{binding_instance_id}", credential)
   end
 
-  def self.unbind(service_instance_id, binding_instance_id, credential)
-    path = "/instances/#{service_instance_id}/bindings/#{binding_instance_id}"
-    url = build_url(credential.teamserver_url, path)
-    options = build_options(credential)
-    execute_with_retry(:delete, url, options)
-  end
-
   def self.unprovision(service_instance_id, credential)
     path = "/instances/#{service_instance_id}"
     url = build_url(credential.teamserver_url, path)
@@ -43,43 +36,16 @@ class Teamserver
     execute_with_retry(:post, url, options)
   end
 
-  # def self.execute_with_retry(method, url, options)
-  #   retries = 0
-
-  #   begin
-  #     response = perform_request(method, url, options)
-  #     raise_if_server_error(response)
-  #     handle_response(response)
-  #   rescue StandardError => e
-  #     retry_or_raise(e, retries) { retries += 1 }
-  #     retry
-  #   end
-  # end
-
   def self.execute_with_retry(method, url, options)
     retries = 0
 
     begin
-      log_request(method, url, options)
-      response = HTTParty.send(method, url, options)
-      log_response(response)
-
-      if response.code >= 500
-        raise StandardError, "Server error: #{response.code} - #{response.body}"
-      end
-
+      response = perform_request(method, url, options)
+      raise_if_server_error(response)
       handle_response(response)
-    rescue => e
-      if retries < MAX_RETRIES
-        sleep_time = RETRY_BACKOFF**retries
-        LOGGER.warn("Retry #{retries + 1}/#{MAX_RETRIES}: #{e.class} - #{e.message}. Sleeping #{sleep_time}s...")
-        sleep(sleep_time)
-        retries += 1
-        retry
-      else
-        LOGGER.error("Request failed after #{MAX_RETRIES} attempts.")
-        raise TeamserverError, "Teamserver request failed: #{e.message}"
-      end
+    rescue StandardError => e
+      retry_or_raise(e, retries) { retries += 1 }
+      retry
     end
   end
 
@@ -133,7 +99,7 @@ class Teamserver
 
     if credential.proxy_user.to_s != ''
       proxy[:http_proxyuser] = credential.proxy_user
-      proxy[:http_proxypass] = credential.proxy_pass&.dig('secret')
+      proxy[:http_proxypass] = credential.proxy_pass
     end
 
     proxy

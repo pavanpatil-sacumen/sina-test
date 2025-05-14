@@ -34,10 +34,6 @@ class Catalog
     @plans.find { |plan| plan.id == plan_id }
   end
 
-  def catalog_response
-    @catalog
-  end
-
   private
 
   def validate_env!

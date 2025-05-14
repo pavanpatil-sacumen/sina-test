@@ -162,7 +162,6 @@ class ServiceBrokerApp < Sinatra::Base
     end
 
     begin
-      Teamserver.unbind(instance_id, binding_id, plan.credentials)
       status 200
       {}.to_json
     rescue StandardError => e
