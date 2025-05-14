@@ -15,7 +15,7 @@ describe 'ServiceBrokerApp' do
 
   describe '/v2/catalog' do
     it 'returns catalog with correct auth given' do
-      basic_authorize ENV['SECURITY_USER_NAME'], ENV['SECURITY_USER_PASSWORD']
+      valid_auth
       get '/v2/catalog'
       last_response
       expect(last_response).to be_ok
@@ -27,7 +27,7 @@ describe 'ServiceBrokerApp' do
     end
 
     it 'returns empty body with incorrect auth given' do
-      basic_authorize 'bad', 'bad'
+      invalid_auth
       get '/v2/catalog'
       expect(last_response.status).to eq(401)
       expect(last_response).to_not be_ok
@@ -39,7 +39,7 @@ describe 'ServiceBrokerApp' do
     it 'returns success for "provisioning" a service instance id' do
       allow(Teamserver).to receive(:provision).and_return(Response.new(201))
 
-      basic_authorize ENV['SECURITY_USER_NAME'], ENV['SECURITY_USER_PASSWORD']
+      valid_auth
       put "/v2/service_instances/#{service_instance_id}", { plan_id: '00000000-1111-2222-3333-000000000000' }
 
       data = JSON.parse(last_response.body)
@@ -51,7 +51,7 @@ describe 'ServiceBrokerApp' do
     it 'returns success for deleting a service instance id' do
       allow(Teamserver).to receive(:unprovision).and_return({ success: true })
 
-      basic_authorize ENV['SECURITY_USER_NAME'], ENV['SECURITY_USER_PASSWORD']
+      valid_auth
       delete "/v2/service_instances/#{service_instance_id}", { plan_id: '00000000-1111-2222-3333-000000000000' }
 
       data = JSON.parse(last_response.body)
@@ -63,7 +63,7 @@ describe 'ServiceBrokerApp' do
     it 'returns failure when plan id not present' do
       allow(Teamserver).to receive(:unprovision).and_return({ success: true })
 
-      basic_authorize ENV['SECURITY_USER_NAME'], ENV['SECURITY_USER_PASSWORD']
+      valid_auth
       delete "/v2/service_instances/#{service_instance_id}", { wrong_plan_id: nil }
 
       data = JSON.parse(last_response.body)
@@ -72,23 +72,25 @@ describe 'ServiceBrokerApp' do
     end
 
     it 'returns failure  - incorrect auth given' do
-      basic_authorize 'bad', 'bad'
+      invalid_auth
       put "/v2/service_instances/#{service_instance_id}", { plan_id: '00000000-1111-2222-3333-000000000000' }
       expect(last_response.status).to eq(401)
 
-      expect(last_response.body).to eq("")
+      expect(last_response.body).to eq('')
 
       delete "/v2/service_instances/#{service_instance_id}", { plan_id: '00000000-1111-2222-3333-000000000000' }
       expect(last_response.status).to eq(401)
-      expect(last_response.body).to eq("")
+      expect(last_response.body).to eq('')
     end
   end
 
   describe '/v2/service_instances/:instance_id/service_bindings/:id' do
     it 'returns a credential for "binding" a service instance' do
       allow(Teamserver).to receive(:bind).and_return(Response.new(201))
-      basic_authorize ENV['SECURITY_USER_NAME'], ENV['SECURITY_USER_PASSWORD']
-      put "/v2/service_instances/#{service_instance_id}/service_bindings/123", { plan_id: '00000000-1111-2222-3333-000000000000' }
+      valid_auth
+      put "/v2/service_instances/#{service_instance_id}/service_bindings/123", {
+        plan_id: '00000000-1111-2222-3333-000000000000'
+      }
 
       expect(last_response.status).to eq(200)
       result = JSON.parse(last_response.body)
@@ -107,8 +109,10 @@ describe 'ServiceBrokerApp' do
     end
 
     it 'not returning success for deleting a binding' do
-      basic_authorize ENV['SECURITY_USER_NAME'], ENV['SECURITY_USER_PASSWORD']
-      delete "/v2/service_instances/#{service_instance_id}/service_bindings/123", { plan_id: '00000000-1111-2222-3333-000000000000' }
+      valid_auth
+      delete "/v2/service_instances/#{service_instance_id}/service_bindings/123", {
+        plan_id: '00000000-1111-2222-3333-000000000000'
+      }
 
       expect(last_response.status).to eq(200)
       data = JSON.parse(last_response.body)
@@ -116,27 +120,41 @@ describe 'ServiceBrokerApp' do
     end
 
     it 'returns failure  - incorrect auth given' do
-      basic_authorize 'bad', 'bad'
-      put "/v2/service_instances/#{service_instance_id}/service_bindings/123", { plan_id: '00000000-1111-2222-3333-000000000000' }
+      invalid_auth
+      put "/v2/service_instances/#{service_instance_id}/service_bindings/123", {
+        plan_id: '00000000-1111-2222-3333-000000000000'
+      }
       expect(last_response.status).to eq(401)
 
-      delete "/v2/service_instances/#{service_instance_id}/service_bindings/123", { plan_id: '00000000-1111-2222-3333-000000000000' }
+      delete "/v2/service_instances/#{service_instance_id}/service_bindings/123", {
+        plan_id: '00000000-1111-2222-3333-000000000000'
+      }
       expect(last_response.status).to eq(401)
     end
   end
 
   describe 'last_operation' do
     it 'returns failure  - incorrect auth given' do
-      basic_authorize 'bad', 'bad'
+      invalid_auth
       put "/v2/service_instances/#{service_instance_id}/last_operation"
       expect(last_response.status).to eq(401)
     end
 
     it 'returns success  - correct auth given' do
-      basic_authorize ENV['SECURITY_USER_NAME'], ENV['SECURITY_USER_PASSWORD']
+      valid_auth
       get "/v2/service_instances/#{service_instance_id}/last_operation"
-      expect(JSON.parse(last_response.body)).to eq({ "state"=>"succeeded" })
+      expect(JSON.parse(last_response.body)).to eq({ 'state' => 'succeeded' })
       expect(last_response.status).to eq(200)
     end
+  end
+
+  private
+
+  def valid_auth
+    basic_authorize ENV['SECURITY_USER_NAME'], ENV['SECURITY_USER_PASSWORD']
+  end
+
+  def invalid_auth
+    basic_authorize 'bad', 'bad'
   end
 end

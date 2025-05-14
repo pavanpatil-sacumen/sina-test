@@ -18,7 +18,9 @@ describe Teamserver do
 
     it 'can build correct Authorization value' do
       auth = Teamserver.build_authorization(credential)
-      expect(auth).to eq('YWdlbnQtMDAwMDAwMDAtMTIzNC0xMjM0LTEyMzQtMTIzNDU2Nzg5MGFiQGNvbnRyYXN0c2VjdXJpdHk6WUsxM0xBNDlIU0QxVQ==')
+      expect(auth).to eq(
+        'YWdlbnQtMDAwMDAwMDAtMTIzNC0xMjM0LTEyMzQtMTIzNDU2Nzg5MGFiQGNvbnRyYXN0c2VjdXJpdHk6WUsxM0xBNDlIU0QxVQ=='
+      )
     end
 
     it 'can build correct headers' do
@@ -26,7 +28,9 @@ describe Teamserver do
       expect(headers).to be_a(Hash)
       expect(headers.keys.length).to eq(4)
       expect(headers['API-Key']).to eq('demo')
-      expect(headers['Authorization']).to eq('YWdlbnQtMDAwMDAwMDAtMTIzNC0xMjM0LTEyMzQtMTIzNDU2Nzg5MGFiQGNvbnRyYXN0c2VjdXJpdHk6WUsxM0xBNDlIU0QxVQ==')
+      expect(headers['Authorization']).to eq(
+        'YWdlbnQtMDAwMDAwMDAtMTIzNC0xMjM0LTEyMzQtMTIzNDU2Nzg5MGFiQGNvbnRyYXN0c2VjdXJpdHk6WUsxM0xBNDlIU0QxVQ=='
+      )
       expect(headers['Content-Type']).to eq('application/json')
     end
 
@@ -170,22 +174,6 @@ describe Teamserver do
       end
     end
 
-    describe 'methods' do
-      let(:credential) do
-        cred = Model::Credential.new
-        cred.username = 'agent_119844af-42ff-4293-b06b-81d426e9a4a9_sacumentesting'
-        cred.service_key = 'F2XI7ABRAUWHYLEQ'
-        cred.api_key = 'RgkGf4ue7mP37qi6LFmZYlJ7kcl3u8MR'
-        cred.teamserver_url = 'https://teamserver-staging.contsec.com'
-        cred.org_uuid = '119844af-42ff-4293-b06b-81d426e9a4a9'
-        cred
-      end
-
-      let(:service_instance_id){
-        'f78a7694-0835-11e8-ba89-0ed5f89f718b'
-      }
-    end
-
     describe '.provision' do
       let(:credential) { double('Credential', org_uuid: 'org-123', teamserver_url: 'https://example.com') }
 
@@ -210,19 +198,22 @@ describe Teamserver do
 
     describe '.unprovision' do
       let(:credential) do
-        double('Credential',
+        double(
+          'Credential',
           org_uuid: 'org-123',
           teamserver_url: 'https://example.com',
           username: 'user',
           password: 'pass',
-          api_key: 'key')
+          api_key: 'key'
+        )
       end
 
       it 'calls execute_with_retry with DELETE, correct URL, and options' do
         expected_url = 'https://example.com/Contrast/api/ng/pivotal/instances/abc123'
         expected_options = { headers: { 'Authorization' => 'Basic ...' } }
 
-        allow(Teamserver).to receive(:build_url).with(credential.teamserver_url, '/instances/abc123').and_return(expected_url)
+        allow(Teamserver).to receive(:build_url).with(
+          credential.teamserver_url, '/instances/abc123').and_return(expected_url)
         allow(Teamserver).to receive(:build_options).with(credential).and_return(expected_options)
 
         expect(Teamserver).to receive(:execute_with_retry).with(:delete, expected_url, expected_options)
@@ -233,12 +224,14 @@ describe Teamserver do
 
     describe '.post_instance' do
       let(:credential) do
-        double('Credential',
+        double(
+          'Credential',
           org_uuid: 'org-123',
           teamserver_url: 'https://example.com',
           username: 'user',
           password: 'pass',
-          api_key: 'key')
+          api_key: 'key'
+        )
       end
 
       it 'builds the URL and options, then calls execute_with_retry with correct args' do
@@ -337,11 +330,11 @@ describe Teamserver do
       context 'when retries equal MAX_RETRIES' do
         it 'logs an error and raises a StandardError' do
           expect(Teamserver).not_to receive(:handle_retry)
-          expect(Teamserver::LOGGER).to receive(:error).with("Request failed after 3 attempts.")
+          expect(Teamserver::LOGGER).to receive(:error).with('Request failed after 3 attempts.')
 
-          expect {
+          expect do
             Teamserver.retry_or_raise(error, 3)
-          }.to raise_error(StandardError, "Teamserver request failed: Something went wrong")
+          end.to raise_error(StandardError, 'Teamserver request failed: Something went wrong')
         end
       end
     end
@@ -367,9 +360,9 @@ describe Teamserver do
         it 'does not raise an error' do
           response = double('Response', code: 200, body: 'OK')
 
-          expect {
+          expect do
             Teamserver.raise_if_server_error(response)
-          }.not_to raise_error
+          end.not_to raise_error
         end
       end
 
@@ -377,9 +370,9 @@ describe Teamserver do
         it 'raises a StandardError with message' do
           response = double('Response', code: 502, body: 'Bad Gateway')
 
-          expect {
+          expect do
             Teamserver.raise_if_server_error(response)
-          }.to raise_error(StandardError, 'Server error: 502 - Bad Gateway')
+          end.to raise_error(StandardError, 'Server error: 502 - Bad Gateway')
         end
       end
     end
@@ -446,15 +439,16 @@ describe Teamserver do
 
       context 'when response is not successful' do
         it 'raises a StandardError with code and body' do
-          response = double('Response',
+          response = double(
+            'Response',
             success?: false,
             code: 400,
             body: 'Bad Request'
           )
 
-          expect {
+          expect do
             Teamserver.handle_response(response)
-          }.to raise_error(StandardError, 'HTTP 400: Bad Request')
+          end.to raise_error(StandardError, 'HTTP 400: Bad Request')
         end
       end
     end
@@ -504,7 +498,7 @@ describe Teamserver do
       end
 
       it 'logs the HTTP status code and body' do
-        expect(Teamserver::LOGGER).to receive(:info).with("Teamserver Response: HTTP 200")
+        expect(Teamserver::LOGGER).to receive(:info).with('Teamserver Response: HTTP 200')
         expect(Teamserver::LOGGER).to receive(:debug).with("Response body: #{response.body}")
 
         Teamserver.log_response(response)
